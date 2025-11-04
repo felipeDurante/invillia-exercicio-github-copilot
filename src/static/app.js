@@ -20,12 +20,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
-        activityCard.innerHTML = `
+        // Header and basic info
+        const header = document.createElement("div");
+        header.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
         `;
+        activityCard.appendChild(header);
+
+        // Participants list
+        const participantsDiv = document.createElement("div");
+        participantsDiv.className = "participants-section";
+
+        const participantsTitle = document.createElement("p");
+        participantsTitle.innerHTML = "<strong>Participants:</strong>";
+        participantsDiv.appendChild(participantsTitle);
+
+        const ul = document.createElement("ul");
+        ul.className = "participant-list";
+
+        if (Array.isArray(details.participants) && details.participants.length > 0) {
+          details.participants.forEach((p) => {
+            const li = document.createElement("li");
+            li.textContent = p;
+            ul.appendChild(li);
+          });
+        } else {
+          const li = document.createElement("li");
+          li.textContent = "No participants yet";
+          li.className = "muted";
+          ul.appendChild(li);
+        }
+
+        participantsDiv.appendChild(ul);
+        activityCard.appendChild(participantsDiv);
 
         activitiesList.appendChild(activityCard);
 
@@ -62,6 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        // Refresh activities so participants list updates immediately
+        fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
